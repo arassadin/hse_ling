@@ -1,8 +1,10 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 # -*- coding: UTF-8 -*-
 
 import sys
-sys.path.append("/home/artsokol/anaconda/lib/python2.7/site-packages")
+#sys.path.append("/home/artsokol/anaconda/lib/python2.7/site-packages")
+import pymorphy2
+import corpus
 
 import nltk
 from nltk.corpus import stopwords
@@ -13,16 +15,11 @@ from nltk.metrics import BigramAssocMeasures
 from nltk.util import ngrams
 from nltk import bigrams
 
-import pymorphy2
-import corpus
 
 noun="СУЩ"
 verb1="ГЛ"
 verb2="ИНФ"
 adj="ПРИЛ"
-#unparsed="None"
-
-#data=['футбол', 'кричать', 'концерт', 'подпевать', 'три', 'театр', 'хлопать', 'куда', 'девать', 'эмоции', 'третьяковская', 'галерея', 'когда-то', 'один', 'ценитель', 'живопись', 'совладать', 'чувства', 'исполосовать', 'полотно', 'репин', 'слава', 'бог', 'наш', 'время', 'посетитель', 'выплескивать', 'эмоция', 'менее', 'варварский', 'способ']
 
 def get_nGramsTemplate(stringToParse):
     return list(stringToParse.upper().split('+'))
@@ -39,6 +36,9 @@ def get_help():
     print("")
 
 if __name__ == "__main__":
+    if sys.version_info < (3, 0):
+        print ("must use python 3.0 or greater")
+        quit()
     if len (sys.argv) > 1: 
         #data preparing 
         morph = pymorphy2.MorphAnalyzer()
