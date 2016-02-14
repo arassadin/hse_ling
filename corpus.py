@@ -33,11 +33,11 @@ class text_unit(object):
                 self.words += filt_text.split()
             # break
 
-        print 'Read {} texts'.format(len(self.texts))
+        print ('Read {} texts'.format(len(self.texts)))
         self.words = set(self.words)
-        print 'Total {} unique words'.format(len(self.words))
+        print ('Total {} unique words'.format(len(self.words)))
         self.words = [word for word in self.words if len(word) > 2]
-        print '{} words after filtering'.format(len(self.words))
+        print ('{} words after filtering'.format(len(self.words)))
 
     def get_lemm(self):
         morph = pymorphy2.MorphAnalyzer()
@@ -46,7 +46,7 @@ class text_unit(object):
             norm = morph.parse(word)[0].normal_form
             if norm is not '':
                 self.lemm.append(norm)
-        print 'Found {} lemmas'.format(len(self.lemm))
+        print ('Found {} lemmas'.format(len(self.lemm)))
 
     def dump(self, path='dumps/dump'):
         pickle.dump(self, open(path, 'wb'))
@@ -115,7 +115,7 @@ class corpus(object):
                     entry.get_lemm()
                 lemmas += entry.lemm
             lemmas = list(set(lemmas))
-            print '{} lemmas selected'.format(len(lemmas))
+            print ('{} lemmas selected'.format(len(lemmas)))
 
         elif sources:
             for entry in self.entries:
@@ -135,7 +135,7 @@ class corpus(object):
                     entry.get_lemm()
                 lemmas += entry.lemm
             lemmas = list(set(lemmas))
-            print '{} lemmas selected'.format(len(lemmas))
+            print ('{} lemmas selected'.format(len(lemmas)))
 
         elif period:
             for entry in self.entries:
@@ -152,7 +152,7 @@ class corpus(object):
                     entry.get_lemm()
                 lemmas += entry.lemm
             lemmas = list(set(lemmas))
-            print '{} lemmas selected'.format(len(lemmas))
+            print ('{} lemmas selected'.format(len(lemmas)))
 
         else:
             for entry in self.entries:
@@ -160,19 +160,19 @@ class corpus(object):
                     entry.get_lemm()
                 lemmas += entry.lemm
             lemmas = list(set(lemmas))
-            print '{} lemmas selected'.format(len(lemmas))
+            print ('{} lemmas selected'.format(len(lemmas)))
 
         return lemmas
 
     def get_info(self):
-        print '*** Corpus info: ***'
-        print '{} sources'.format(len(self.sources))
-        print '{} lemmas'.format(len(self.stats['lemmas']['value']))
-        print '{} statistics:'.format(len(self.stats))
+        print ('*** Corpus info: ***')
+        print ('{} sources'.format(len(self.sources)))
+        print ('{} lemmas'.format(len(self.stats['lemmas']['value'])))
+        print ('{} statistics:'.format(len(self.stats)))
         for stat_name, stat in self.stats.items():
-            print '\t{}: {}'.format(stat_name,
-                                    stat.get('descr', '--no description--'))
-        print '*** end corpus info ***'
+            print ('\t{}: {}'.format(stat_name,
+                                                stat.get('descr', '--no description--')))
+        print ('*** end corpus info ***')
 
     def add_stat(self, name, value, descr):
         self.stats[name] = {'value': value, 'descr': descr}
