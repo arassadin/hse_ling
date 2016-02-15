@@ -1,26 +1,16 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 
-<<<<<<< HEAD:command_line_tool.py
+
+
+
 import getopt,sys
+
+#keep for my env compatibility
 sys.path.append("/home/artsokol/anaconda/lib/python2.7/site-packages")
-=======
-import sys
-# sys.path.append("/home/artsokol/anaconda/lib/python2.7/site-packages")
->>>>>>> 9a3da7e59146398d736967342fa7449646f7c046:cli.py
+
 import pymorphy2
 import corpus
-
-### is needed ? ###
-# import nltk
-# from nltk.corpus import stopwords
-# from nltk.stem import PorterStemmer
-# from nltk.tokenize import WordPunctTokenizer
-# from nltk.collocations import BigramCollocationFinder
-# from nltk.metrics import BigramAssocMeasures
-# from nltk import bigrams
-### ---------- ####
-
 from nltk.util import ngrams
 
 
@@ -30,7 +20,7 @@ verb2 = "ИНФ"
 adj = "ПРИЛ"
 
 
-def main():
+def get_options(a_period):
     if sys.version_info < (3, 0):
         print ("must use python 3.0 or greater")
         sys.exit()
@@ -40,26 +30,25 @@ def main():
     except getopt.GetoptError as err:
         # print help information and exit:
         print(err) # will print something like "option -a not recognized"
-        get_usage()
+        usage()
         sys.exit(2)
     for o, a in opts:
         if o in ("-h", "--help"):
-            get_usage()
+            usage()
             sys.exit()
         elif o in ("-c", "--corpus"):
             if a == "":
-                get_usage()
+                usage()
                 sys.exit()
-
-            input_period = a
+            a_period.append(a.split(','))
         else:
             assert False, "unhandled option"
 
 def get_nGramsTemplate(stringToParse):
     return list(stringToParse.upper().split('+'))
 
-<<<<<<< HEAD:command_line_tool.py
-def get_help():
+
+def help():
     print("Show n-gramms in corpus:")
     print("Command sequence:")
     print("  WORD1+WORD2+...WORDn")
@@ -71,30 +60,24 @@ def get_help():
     print("exit - terminal closing")
     print("help - show this info")
 
-def get_usage():
-=======
-
-def help():
->>>>>>> 9a3da7e59146398d736967342fa7449646f7c046:cli.py
+def usage():
     print("Usage:")
     print("cli_tool args") 
-    print("-c year_begin-year_end Mnadatory parameter. Certain time period shoud be specifyed")
+    print("-c first_year,last_year Mandatory parameter. Certain time period shoud be specifyed")
     print("-h get usage info")
     print("")
-    print("--corpus=year_begin-year_end")
+    print("--corpus=year_begin,year_end")
     print("--help the same as -h")
 
 if __name__ == "__main__":
-<<<<<<< HEAD:command_line_tool.py
-    input_period=None
-    main()
+    input_period=[]
+    get_options(a_period=input_period)
 
-    #if len (sys.argv) > 1: 
-        #data preparing 
+    #data preparing 
     corp = corpus.corpus()
-    corp.load('dumps/corp.dump')
-#period=[2001-2005]
-    data = corp.get_lemm([1997-2010])
+    corp.load('dumps/corp_multy-lemm.dump')
+
+    data = corp.get_lemm(period=[int(input_period[0][0]),int(input_period[0][1])])
     morph = pymorphy2.MorphAnalyzer()
 
     print("Enter n-gramm sequence or help")
@@ -109,51 +92,19 @@ if __name__ == "__main__":
         else:
             #TODO word checking
             ngram_list = get_nGramsTemplate(command)
-   
+            print (ngram_list)
             n_grams = ngrams(data, ngram_list.__len__())
 
             for grams in n_grams:
                 i = 0
+
                 for item in grams:
-                    if (morph.parse(item)[0].tag.POS == None) or \
+                    if (morph.parse(item)[0].tag.POS is None) or \
                         ((ngram_list[i] != morph.lat2cyr(morph.parse(item)[0].tag.POS)) and not (ngram_list[i] == verb1 and morph.lat2cyr(morph.parse(item)[0].tag.POS) == verb2)):
                         break #
-                i += 1
+                    i += 1
+                
                 #print if every item is equal
                 if i == ngram_list.__len__():
                     print(grams)
 
-=======
-    if sys.version_info < (3, 0):
-        print ("must use python 3.0 or greater")
-        quit()
-    if len(sys.argv) > 1:
-        # data preparing
-        morph = pymorphy2.MorphAnalyzer()
-        corp = corpus.corpus()
-        corp.load('dumps/corp_multy-lemm.dump')
-        # corp.get_info()
-        data = corp.get_lemm(period=[2001, 2005])
-        ngram_list = get_nGramsTemplate(sys.argv[1])
-
-        n_grams = ngrams(data, ngram_list.__len__())
-
-        for grams in n_grams:
-            i = 0
-            for item in grams:
-                if morph.parse(item)[0].tag.POS is None or (
-                        ngram_list[i] != morph.lat2cyr(
-                            morph.parse(item)[0].tag.POS) and not (
-                        ngram_list[i] == verb1 and
-                        morph.lat2cyr(morph.parse(item)[0].tag.POS) == verb2
-                        )
-                ):
-                    break
-                i += 1
-            # print if every item is equal
-            if i == ngram_list.__len__():
-                print(grams)
-    else:
-        help()
-        quit()
->>>>>>> 9a3da7e59146398d736967342fa7449646f7c046:cli.py
