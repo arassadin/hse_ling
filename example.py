@@ -83,5 +83,13 @@ def main():
 
     corp.get_info()
 
+    # lemm_rate = corp.get_lemm_freq()
+    # for lemm, q in lemm_rate:
+    #     print('{}: {} times'.format(lemm, q))
+
+    lemm_rate = corp.get_lemm_freq(5)
+    for lemm, q in lemm_rate:
+        print('{}: {} times'.format(lemm, q))
+
 if __name__ == "__main__":
     main()
