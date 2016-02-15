@@ -5,6 +5,8 @@ import string
 import re
 import pymorphy2
 import pickle
+import collections
+from operator import itemgetter
 
 
 class text_unit(object):
@@ -34,19 +36,23 @@ class text_unit(object):
             # break
 
         print ('Read {} texts'.format(len(self.texts)))
-        self.words = set(self.words)
+        # self.words = set(self.words)
         print ('Total {} unique words'.format(len(self.words)))
-        self.words = [word for word in self.words if len(word) > 2]
+        # self.words = [word for word in self.words if len(word) > 2]
         print ('{} words after filtering'.format(len(self.words)))
 
     def get_lemm(self):
         morph = pymorphy2.MorphAnalyzer()
         self.lemm = []
         for word in self.words:
-            norm = morph.parse(word)[0].normal_form
-            if norm is not '':
-                self.lemm.append(norm)
+            if len(word) > 2:
+                norm = morph.parse(word)[0].normal_form
+                if norm is not '':
+                    self.lemm.append(norm)
         print ('Found {} lemmas'.format(len(self.lemm)))
+
+    def get_lemm_unique(self):
+        return list(set(self.lemm))
 
     def dump(self, path='dumps/dump'):
         pickle.dump(self, open(path, 'wb'))
@@ -83,7 +89,7 @@ class corpus(object):
             self.lemm += entry.lemm
         self.dates = list(set(self.dates))
         self.sources = list(set(self.sources))
-        self.lemm = list(set(self.lemm))
+        # self.lemm = list(set(self.lemm))
         self.update_stat()
 
     def get_lemm(self, sources=None, period=None):
@@ -114,7 +120,7 @@ class corpus(object):
                 if entry.lemm == []:
                     entry.get_lemm()
                 lemmas += entry.lemm
-            lemmas = list(set(lemmas))
+            # lemmas = list(set(lemmas))
             print ('{} lemmas selected'.format(len(lemmas)))
 
         elif sources:
@@ -134,7 +140,7 @@ class corpus(object):
                 if entry.lemm == []:
                     entry.get_lemm()
                 lemmas += entry.lemm
-            lemmas = list(set(lemmas))
+            # lemmas = list(set(lemmas))
             print ('{} lemmas selected'.format(len(lemmas)))
 
         elif period:
@@ -151,7 +157,7 @@ class corpus(object):
                 if entry.lemm == []:
                     entry.get_lemm()
                 lemmas += entry.lemm
-            lemmas = list(set(lemmas))
+            # lemmas = list(set(lemmas))
             print ('{} lemmas selected'.format(len(lemmas)))
 
         else:
@@ -159,10 +165,19 @@ class corpus(object):
                 if entry.lemm == []:
                     entry.get_lemm()
                 lemmas += entry.lemm
-            lemmas = list(set(lemmas))
+            # lemmas = list(set(lemmas))
             print ('{} lemmas selected'.format(len(lemmas)))
 
+        self.lemm = lemmas
         return lemmas
+
+    def get_lemm_freq(self, topq=None, unique=False):
+        counter = collections.Counter(self.lemm)
+        if topq is None:
+            return sorted(zip(self.lemm, counter.values()),
+                          key=itemgetter(1), reverse=True)
+        else:
+            return counter.most_common(topq)
 
     def get_info(self):
         print ('*** Corpus info: ***')
@@ -171,7 +186,7 @@ class corpus(object):
         print ('{} statistics:'.format(len(self.stats)))
         for stat_name, stat in self.stats.items():
             print ('\t{}: {}'.format(stat_name,
-                                                stat.get('descr', '--no description--')))
+                                     stat.get('descr', '--no description--')))
         print ('*** end corpus info ***')
 
     def add_stat(self, name, value, descr):
