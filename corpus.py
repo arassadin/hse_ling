@@ -8,6 +8,15 @@ import pickle
 import collections
 from operator import itemgetter
 
+EXCLUDE_SYMBOLS = ['№', '«', 'ђ', '°', '±', '‚', 'ћ', '‰', '…',
+                   '»', 'ѓ', 'µ', '·', 'ґ', 'њ', 'ї', 'џ', 'є', '‹',
+                   '‡', '†', '¶', 'ќ', '€', '“', 'ў', '§', '„', '”',
+                   '\ufeff', '’', 'љ', '›', '•', '—', '‘', '\x7f', '\xad', '¤']
+
+EXCLUDE_SYMBOLS_STR = ''
+for symb in EXCLUDE_SYMBOLS:
+    EXCLUDE_SYMBOLS_STR += str(symb)
+
 
 class text_unit(object):
 
@@ -20,6 +29,7 @@ class text_unit(object):
         files = glob.glob(os.path.join(root, folder, suffix))
         regex_punct = re.compile('[%s]' % re.escape(string.punctuation))
         regex_dig = re.compile('[%s]' % re.escape(string.digits))
+        regex_symb = re.compile('[%s]' % re.escape(EXCLUDE_SYMBOLS_STR))
         regex_struct = re.compile(
             '[%s]' % string.printable + string.whitespace)
 
@@ -30,6 +40,7 @@ class text_unit(object):
                 raw_text = text.read()
                 filt_text = regex_punct.sub('', raw_text)
                 filt_text = regex_dig.sub('', filt_text)
+                filt_text = regex_symb.sub('', filt_text)
                 filt_text = regex_struct.sub('', filt_text)
                 self.texts.append(filt_text)
                 self.words += filt_text.split()

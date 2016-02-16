@@ -77,6 +77,8 @@ def main():
     # corp.add_stat(
     #     name='16_lemmas', value=lemmas, descr='Lemmas from 2016')
 
+    # corp.get_lemm()
+
     # corp.dump('dumps/corp_multy-lemm.dump')
 
     corp.load('dumps/corp_multy-lemm.dump')
