@@ -18,13 +18,13 @@ verb2 = "ИНФ"
 adj = "ПРИЛ"
 
 
-def get_options(a_period,a_output):
+def get_options(a_period,a_output=None,a_source=None):
     if sys.version_info < (3, 0):
         print ("must use python 3.0 or greater")
         sys.exit()
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hoc:", ["help", "output=","corpus="])
+        opts, args = getopt.getopt(sys.argv[1:], "hocs:", ["help", "output=","corpus=","source="])
     except getopt.GetoptError as err:
         # print help information and exit:
         print(err)  # will print something like "option -a not recognized"
@@ -44,6 +44,12 @@ def get_options(a_period,a_output):
                 usage()
                 sys.exit()
             a_period.append(a.split(','))
+        elif o in ("-s", "--source"):
+            if a == "":
+                usage()
+                sys.exit()
+            a_source.append(a)
+            print (a_source)
         else:
             assert False, "unhandled option"
 
@@ -51,7 +57,7 @@ def get_options(a_period,a_output):
         usage()
         sys.exit() 
 
-def print_out(data,outfile):
+def print_out(data,outfile=None):
     print(data)
     if outfile != None:
         print(data, file=outfile)  
@@ -74,20 +80,25 @@ def help():
 
 
 def usage():
-    print("Usage:")
-    print("cli_tool args")
-    print("-c [first_year,last_year]\tMandatory parameter. Certain time period shoud be specifyed")
-    print("-o [file]\t\t\tOutput all information into file")    
-    print("-h\t\t\t\tGet usage info")
+    print("NAME:")
+    print("\tcli.py - command line tool for corpus management")
+    print("SYNOPSIS:")
+    print("\tcli.py -c first_year,last_year [options]")
+    print("OPTIONS:")
+    print("\t-c first_year,last_year, --corpus=first_year,last_year\t\tMandatory parameter. Certain time period shoud be specifyed")
+    print("\t-h, --help\t\t\t\t\t\t\tGet usage info")
+    print("\t-o file, --output=file\t\t\t\t\t\tOutput all information into file")    
+    print("\t-s name1,name2,..nameN, --source=name1,name2,..nameN\t\tSpecifies the corpus source newspaper. Valid sources are RG, Novaya")
+    print("\t\t\t\t\t\t\t\t\tWithout key all possible sources are used")
     print("")
-    print("--corpus=[year_begin,year_end]\tThe same as -c")
-    print("--output=[file]\t\t\tThe same as -o")
-    print("--help\t\t\t\tThe same as -h")
+
 
 if __name__ == "__main__":
     input_period = []
     output = []
-    get_options(a_period=input_period,a_output=output)
+    newspaper = []
+    output_file = None
+    get_options(a_period=input_period,a_output=output,a_source=newspaper)
 
     # data preparing
     if output != []:
@@ -99,10 +110,11 @@ if __name__ == "__main__":
 
     #TODO check periods for int
     data = corp.get_lemm(
-        period=[int(input_period[0][0]), int(input_period[0][1])])
+        period=[int(input_period[0][0]), int(input_period[0][1])],sources=newspaper)
     morph = pymorphy2.MorphAnalyzer()
 
-    print("Enter n-gramm sequence or help")
+    print_out("Enter n-gramm sequence or help",output_file)
+    #corp.get_info()
     while 1:
         command = input('--> ')
         if command == "help":
