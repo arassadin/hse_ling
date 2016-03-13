@@ -18,7 +18,9 @@ dir_path = 'data/*/*.txt'
 all_texts = glob.glob(dir_path)
 
 for text in all_texts:
-response = alchemyapi.entities('text', text, {'sentiment': 1})
+    with open(text, 'r') as myfile:
+        file = myfile.read().replace('\n')
+response = alchemyapi.entities('text', file, {'sentiment': 1})
 
 if response['status'] == 'OK':
     print('## Response Object ##')
@@ -37,7 +39,7 @@ if response['status'] == 'OK':
 else:
     print('Error in entity extraction call: ', response['statusInfo'])
 
-response = alchemyapi.keywords('text', text, {'sentiment': 1})
+response = alchemyapi.keywords('text', file, {'sentiment': 1})
 
 if response['status'] == 'OK':
     print('## Response Object ##')
@@ -55,7 +57,7 @@ if response['status'] == 'OK':
 else:
     print('Error in keyword extaction call: ', response['statusInfo'])
 
-response = alchemyapi.concepts('text', text)
+response = alchemyapi.concepts('text', file)
 
 if response['status'] == 'OK':
     print('## Object ##')
@@ -70,7 +72,7 @@ if response['status'] == 'OK':
 else:
     print('Error in concept tagging call: ', response['statusInfo'])
 
-response = alchemyapi.language('text', text)
+response = alchemyapi.language('text', file)
 
 if response['status'] == 'OK':
     print('## Response Object ##')
@@ -85,7 +87,7 @@ if response['status'] == 'OK':
 else:
     print('Error in language detection call: ', response['statusInfo'])
 
-response = alchemyapi.sentiment_targeted('text', text, 'Denver')
+response = alchemyapi.sentiment_targeted('text', file, 'Denver')
 
 if response['status'] == 'OK':
     print('## Response Object ##')
