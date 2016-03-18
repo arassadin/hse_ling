@@ -12,7 +12,7 @@ import corpus
 import collocation
 import find_by_mask
 from nltk.util import ngrams
-
+import freqs
 
 noun = "СУЩ"
 verb1 = "ГЛ"
@@ -71,7 +71,9 @@ def help():
            "    defined by parts of speech\n"
            "    and save into <file_name> file (stdout by default)\n"
            "    <file_name> is optional")
-    #print ("freq <n for ngrams> - count frequencies for all ngrams and save it into freq.txt file")
+    print ("freq <n for ngrams> - count frequencies for all ngrams\n"
+           "    and save it into freq.txt file\n"
+           "    n can be from 1 to 3")
     #print ("sentiment - output in file sorted text sentiments for the chosen corpus")
     print ("help - for help")
     print ("exit - for exit")
@@ -98,29 +100,47 @@ if __name__ == "__main__":
     corp = corpus.corpus()
     corp.load('dumps/corp_multy-lemm.dump')
     data = corp.get_lemm(period=[int(input_period[0][0]), int(input_period[0][1])], sources=newspaper)
+    help()
     while True:
-        help()
         command = input('--> ')
         if command == "help":
             help()
+
         elif command[:len("collocation")] == "collocation":
             try:
                 command.split(' ')[1]
             except:
                 print ("ngram wasn't found")
+                help()
                 continue
             collocation.find_collocations(data, command.split(' ')[1:])
+
         elif command[:len("mask_search")] == "mask_search":
             try:
                 find_by_mask.find_by_part_of_speech(data, command.split(' ')[1])
             except:
                 find_by_mask.find_by_part_of_speech(data)
+
         elif command[:len("freq")] == "freq":
-            print ("not supported")
+            try:
+                if(int(command.split(' ')[1]) not in range(1,4)):
+                    print ("incorrect n for ngrams\n")
+                    help()
+                    continue
+            except:
+                print ("incorrect n for ngrams\n")
+                help()
+                continue
+            freqs.get_ngrams_with_frequencies(data, int(command.split(' ')[1]))
+
         elif command[:len("exit")] == "exit":
             sys.exit()
+
         elif command[:len("sentiment")] == "sentiment":
             print ("not supported")
+            help()
+
         else:
             print ("incorrect command\n")
+            help()
 

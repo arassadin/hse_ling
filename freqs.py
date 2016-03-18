@@ -1,12 +1,12 @@
 ﻿import nltk
-from nltk.probability import FreqDist
 
-def get_ngrams_with_frequencies(n_grams):
-	freqs_file = open('freq.txt', 'a')
+def get_ngrams_with_frequencies(data, n):
+	freqs_file = open('freq.txt', 'w')
 	freqs_file.truncate(0)
-	for freq in nltk.FreqDist(n_grams).most_common():
-		n_gram = ''
-		for i in range(0, len(freq[0])):
-			n_gram += freq[0][i] + ' '
-		print( n_gram, freq [1], file=freqs_file)
+	freqs_all = nltk.FreqDist(nltk.ngrams(data, n)).most_common()
+	for freq in freqs_all:
+		print (" ".join(freq[0]), freq[1], file=freqs_file)
+	for freq in freqs_all[:10]:
+		print (" ".join(freq[0]), freq[1])
 	freqs_file.close()
+	return freqs_all
