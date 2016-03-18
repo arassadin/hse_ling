@@ -1,19 +1,18 @@
 def print_out(what_to_write, where_to_write="", what_to_find=""):
 	if where_to_write != "":
 		f = open(where_to_write, "w")
+		print (what_to_find, file=f)
 	counter = 0
 	for i, j in sorted(what_to_write.items(), key=lambda item: item[1], reverse=True):
 		if i.find('_') != -1:
 			if where_to_write == "":
 				print (i.split("_")[0], i.split("_")[1], j)
 			else:
-				print (what_to_find, file=f)
 				print (i.split("_")[0], i.split("_")[1], j, file=f)
 		else:
 			if where_to_write == "":
 				print (i, j)
 			else:
-				print (what_to_find, file=f)
 				print (i, j, file=f)
 		counter+=1
 		if counter > 2 and where_to_write == "":
