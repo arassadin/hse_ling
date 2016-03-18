@@ -9,6 +9,8 @@ sys.path.append("/home/artsokol/anaconda/lib/python2.7/site-packages")
 
 import pymorphy2
 import corpus
+import collocation
+import find_by_mask
 from nltk.util import ngrams
 
 
@@ -22,9 +24,9 @@ def get_options(a_period,a_output=None,a_source=None):
     if sys.version_info < (3, 0):
         print ("must use python 3.0 or greater")
         sys.exit()
-
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hocs:", ["help", "output=","corpus=","source="])
+        #opts, args = getopt.getopt(sys.argv[1:], "hocs:", ["help", "output=","corpus=","source="])
+        opts, args = getopt.getopt(sys.argv[1:], "hocs:", ["help", "corpus=","source="])
     except getopt.GetoptError as err:
         # print help information and exit:
         print(err)  # will print something like "option -a not recognized"
@@ -34,11 +36,6 @@ def get_options(a_period,a_output=None,a_source=None):
         if o in ("-h", "--help"):
             usage()
             sys.exit()
-        elif o in ("-o", "--output"):
-            if a == "":
-                usage()
-                sys.exit()
-            a_output.append(a)
         elif o in ("-c", "--corpus"):
             if a == "":
                 usage()
@@ -65,19 +62,19 @@ def print_out(data,outfile=None):
 def get_nGramsTemplate(stringToParse):
     return list(stringToParse.upper().split('+'))
 
-
 def help():
-    print("Show n-gramms in corpus:")
-    print("Command sequence:")
-    print("  WORD1+WORD2+...WORDn")
-    print("Alowed words for sequence:")
-    print("  СУЩ, ГЛ, ПРИЛ, Н, ПРИЧ, ДЕЕПР, ЧИСЛ")
-    print("Example:")
-    print("  инф+прил+сущ")
-    print("  ГЛ+СУЩ")
-    print("exit - terminal closing")
-    print("help - show this info")
-
+    print ("choice action:")
+    print ("collocation <ngram_with_spaces> - find all collocations for the ngram,\n"
+           "    save into *_collocation.txt files\n"
+           "    and output three the most common collocations")
+    print ("mask_search <file_name> - find all phrases according its mask\n"
+           "    defined by parts of speech\n"
+           "    and save into <file_name> file (stdout by default)\n"
+           "    <file_name> is optional")
+    #print ("freq <n for ngrams> - count frequencies for all ngrams and save it into freq.txt file")
+    #print ("sentiment - output in file sorted text sentiments for the chosen corpus")
+    print ("help - for help")
+    print ("exit - for exit")
 
 def usage():
     print("NAME:")
@@ -87,11 +84,10 @@ def usage():
     print("OPTIONS:")
     print("\t-c first_year,last_year, --corpus=first_year,last_year\t\tMandatory parameter. Certain time period shoud be specifyed")
     print("\t-h, --help\t\t\t\t\t\t\tGet usage info")
-    print("\t-o file, --output=file\t\t\t\t\t\tOutput all information into file")    
+    #print("\t-o file, --output=file\t\t\t\t\t\tOutput all information into file")
     print("\t-s name1,name2,..nameN, --source=name1,name2,..nameN\t\tSpecifies the corpus source newspaper. Valid sources are RG, Novaya")
     print("\t\t\t\t\t\t\t\t\tWithout key all possible sources are used")
     print("")
-
 
 if __name__ == "__main__":
     input_period = []
@@ -99,59 +95,32 @@ if __name__ == "__main__":
     newspaper = []
     output_file = None
     get_options(a_period=input_period,a_output=output,a_source=newspaper)
-
-    # data preparing
-    if output != []:
-        output_file = open(output[0], 'w')
-
     corp = corpus.corpus()
     corp.load('dumps/corp_multy-lemm.dump')
-
-
-    #TODO check periods for int
-    data = corp.get_lemm(
-        period=[int(input_period[0][0]), int(input_period[0][1])],sources=newspaper)
-    morph = pymorphy2.MorphAnalyzer()
-
-    print_out("Enter n-gramm sequence or help",output_file)
-    #corp.get_info()
-    while 1:
+    data = corp.get_lemm(period=[int(input_period[0][0]), int(input_period[0][1])], sources=newspaper)
+    while True:
+        help()
         command = input('--> ')
         if command == "help":
             help()
-        elif command == "exit":
-            if output != []:
-                output_file.close()
+        elif command[:len("collocation")] == "collocation":
+            try:
+                command.split(' ')[1]
+            except:
+                print ("ngram wasn't found")
+                continue
+            collocation.find_collocations(data, command.split(' ')[1:])
+        elif command[:len("mask_search")] == "mask_search":
+            try:
+                find_by_mask.find_by_part_of_speech(data, command.split(' ')[1])
+            except:
+                find_by_mask.find_by_part_of_speech(data)
+        elif command[:len("freq")] == "freq":
+            print ("not supported")
+        elif command[:len("exit")] == "exit":
             sys.exit()
-        elif command == "":
-            continue
+        elif command[:len("sentiment")] == "sentiment":
+            print ("not supported")
         else:
-            # TODO word checking
-            ngram_list = get_nGramsTemplate(command)
-            
-            print_out(ngram_list,output_file)
+            print ("incorrect command\n")
 
-            n_grams = ngrams(data, ngram_list.__len__())
-
-            for grams in n_grams:
-                i = 0
-
-                for item in grams:
-                    if (
-                        morph.parse(item)[0].tag.POS is None) or (
-                        (
-                            ngram_list[i] != morph.lat2cyr
-                            (
-                                morph.parse(item)[0].tag.POS
-                            )
-                        ) and not (ngram_list[i] == verb1 and morph.lat2cyr(morph.parse(item)[0].tag.POS) == verb2
-                                   )
-                    ):
-                        break
-                    i += 1
-
-                # print if every item is equal
-                if i == ngram_list.__len__():
-                    print_out(grams,output_file)
-
-            print_out("",output_file)
