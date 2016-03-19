@@ -19,7 +19,7 @@ def sentiment(path):
     texts = glob.glob(path_files)
     for text in texts:
         with open(text, 'r') as myfile:
-            file = myfile.read().replace('\n')
+            file = myfile.read().replace('\n', '')
         response = alchemyapi.sentiment_targeted('text', file, 'Denver')
         if response['status']=='OK':
             print('## Response Object ##')
