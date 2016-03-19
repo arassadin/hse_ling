@@ -14,8 +14,7 @@ def sentiment(path):
     maximum = 0
     minimum = 0
     text_tolality = []
-
-    path_files = path + '/*/*.txt'
+    path_files = path._str_() + '/*/*.txt'
     texts = glob.glob(path_files)
     for text in texts:
         with open(text, 'r') as myfile:
@@ -51,3 +50,8 @@ def sentiment(path):
             print('Error in targeted sentiment analysis call: ',
                   response['statusInfo'])
     return text_tolality
+
+if __name__ == '__main__':
+    import sys
+    if len(sys.argv) == 2 and sys.argv[1]:
+        sentiment(sys.argv[1])
