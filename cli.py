@@ -13,6 +13,7 @@ import collocation
 import find_by_mask
 from nltk.util import ngrams
 import freqs
+import tonality
 
 noun = "СУЩ"
 verb1 = "ГЛ"
@@ -63,7 +64,7 @@ def get_nGramsTemplate(stringToParse):
     return list(stringToParse.upper().split('+'))
 
 def help():
-    print ("choice action:")
+    print ("actions:")
     print ("collocation <ngram_with_spaces> - find all collocations for the ngram,\n"
            "    save into *_collocation.txt files\n"
            "    and output three the most common collocations")
@@ -74,7 +75,7 @@ def help():
     print ("freq <n for ngrams> - count frequencies for all ngrams\n"
            "    and save it into freq.txt file\n"
            "    n can be from 1 to 3")
-    #print ("sentiment - output in file sorted text sentiments for the chosen corpus")
+    print ("sentiment - output files with max and min tones for the chosen corpus")
     print ("help - for help")
     print ("exit - for exit")
 
@@ -137,8 +138,7 @@ if __name__ == "__main__":
             sys.exit()
 
         elif command[:len("sentiment")] == "sentiment":
-            print ("not supported")
-            help()
+            tonality.ask_sentiment(print_max_min_texts=True, years=input_period, sources=newspaper)
 
         else:
             print ("incorrect command\n")
