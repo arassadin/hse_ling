@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: UTF-8 -*-
 
 import getopt
@@ -27,7 +27,7 @@ def get_options(a_period,a_output=None,a_source=None):
         sys.exit()
     try:
         #opts, args = getopt.getopt(sys.argv[1:], "hocs:", ["help", "output=","corpus=","source="])
-        opts, args = getopt.getopt(sys.argv[1:], "hocs:", ["help", "corpus=","source="])
+        opts, args = getopt.getopt(sys.argv[1:], "hc:s:", ["help", "corpus=","source="])
     except getopt.GetoptError as err:
         # print help information and exit:
         print(err)  # will print something like "option -a not recognized"
